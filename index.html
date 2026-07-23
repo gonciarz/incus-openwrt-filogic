@@ -6,18 +6,20 @@
 </head>
 <body>
 <h1>incus-openwrt-filogic</h1>
-<p>Static Incus (client and server) build for OpenWrt/aarch64 (Filogic).</p>
+<p>Static Incus (client and server) build for OpenWrt/aarch64 (Filogic),
+compiled with <code>-mcpu=cortex-a73</code> for Filogic 880 (MT7988A)
+devices - stays compatible with Filogic 830 (MT7986) devices too.</p>
 <h2>How to add the repository to OpenWrt</h2>
 <pre>wget -O /etc/apk/keys/incus-openwrt-filogic.rsa.pub \
     https://gonciarz.github.io/incus-openwrt-filogic/incus-openwrt-filogic.rsa.pub
-echo 'https://gonciarz.github.io/incus-openwrt-filogic/aarch64' \
-    > /etc/apk/repositories.d/incus.lst
+echo 'https://gonciarz.github.io/incus-openwrt-filogic' \
+    > /etc/apk/repositories.d/incus.list
 
 apk update
 apk add attr-static squashfs-tools-unsquashfs-static xz-static incus-static</pre>
 <h1>Index of /</h1>
 <ul>
-<li><a href="aarch64">aarch64</a></li><li><a href="incus-openwrt-filogic.rsa.pub">incus-openwrt-filogic.rsa.pub</a></li>
+<li><a href="aarch64_cortex-a53">aarch64_cortex-a53</a></li><li><a href="incus-openwrt-filogic.rsa.pub">incus-openwrt-filogic.rsa.pub</a></li>
 </ul>
 </body>
 </html>
