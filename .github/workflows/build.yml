@@ -1,0 +1,93 @@
+name: Build Incus for OpenWrt
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      incus_version:
+        description: 'Incus version'
+        required: true
+        default: '7.0.1'
+
+env:
+  INCUS_VERSION: ${{ github.event.inputs.incus_version || '7.0.1' }}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # Native runner, not an Alpine container job - see README.
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build binaries
+      run: |
+        docker build --build-arg INCUS_VERSION="$INCUS_VERSION" -t incus-builder .
+        mkdir -p output
+        docker run --rm -v "$PWD/output:/mnt" incus-builder \
+          sh -c "cp -a /output/. /mnt/"
+        # docker run copies files out owned by root; later steps run as the
+        # non-root runner user and need write access under output/.
+        sudo chown -R "$(id -u):$(id -g)" output
+
+    - name: Verify static linking
+      run: OUT_DIR=output ./scripts/verify-static.sh
+
+    - name: Build APK packages
+      run: |
+        docker run --rm \
+          -v "$PWD:/work" \
+          -e INCUS_VERSION="$INCUS_VERSION" \
+          -e INCUS_SIGN_KEY="${{ secrets.INCUS_SIGN_KEY }}" \
+          -e OUT_DIR=/work/output \
+          -e INCUS_INITD=/work/incus.initd \
+          -w /work \
+          alpine:3.24 sh -c 'apk add --no-cache openssl && sh scripts/build-apk-packages.sh'
+
+    - name: Bundle raw binaries for release
+      run: |
+        mkdir -p output/release
+        tar -C output --zstd -cf "output/release/incus-${INCUS_VERSION}-aarch64.tar.zst" \
+          incusd incus setfattr unsquashfs xz
+
+    - name: Upload release assets
+      uses: softprops/action-gh-release@v2
+      with:
+        files: output/release/*
+
+    - name: Publish apk repository to GitHub Pages
+      run: |
+        mkdir -p output/pages/aarch64_cortex-a53
+        cp output/pkg/packages.adb output/pkg/*.apk output/pages/aarch64_cortex-a53/
+        cp output/pkg/incus-openwrt-filogic.pem output/pages/incus-openwrt-filogic.pem
+        cp pages/style.css output/pages/style.css
+
+        files=""
+        for f in output/pages/*; do
+          name="$(basename "$f")"
+          [ "$name" = "index.html" ] && continue
+          [ "$name" = "style.css" ] && continue
+          files="$files<li><a href=\"$name\">$name</a></li>"
+        done
+        awk -v files="$files" '{gsub(/<!--FILES-->/, files)}1' pages/index.html > output/pages/index.html
+
+        files=""
+        for f in output/pages/aarch64_cortex-a53/*; do
+          name="$(basename "$f")"
+          [ "$name" = "index.html" ] && continue
+          size="$(du -h --apparent-size "$f" | cut -f1)"
+          files="$files<li><a href=\"$name\">$name</a><span>$size</span></li>"
+        done
+        awk -v files="$files" '{gsub(/<!--FILES-->/, files)}1' pages/aarch64-index.html > output/pages/aarch64_cortex-a53/index.html
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: output/pages
+        publish_branch: gh-pages
