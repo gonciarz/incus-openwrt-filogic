@@ -1,5 +1,22 @@
-<!doctype html><html><head><title>Index of /</title></head><body>
-<h1>Index of /</h1><ul>
-<li><a href="aarch64">aarch64</a> (31M)</li>
-<li><a href="incus-openwrt-filogic.rsa.pub">incus-openwrt-filogic.rsa.pub</a> (4.0K)</li>
-</ul></body></html>
+<!doctype html>
+<html>
+<head>
+<title>incus-openwrt-filogic</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>incus-openwrt-filogic</h1>
+<p>Static Incus (client and server) build for OpenWrt/aarch64 (Filogic).</p>
+<h2>How to add the repository to OpenWrt</h2>
+<pre>wget -O /etc/apk/keys/incus-openwrt-filogic.rsa.pub \
+    https://gonciarz.github.io/incus-openwrt-filogic/incus-openwrt-filogic.rsa.pub
+echo 'https://gonciarz.github.io/incus-openwrt-filogic/aarch64' > /etc/apk/repositories.d/incus.lst
+
+apk update
+apk add incus-static</pre>
+<h1>Index of /</h1>
+<ul>
+<li><a href="aarch64">aarch64</a></li><li><a href="incus-openwrt-filogic.rsa.pub">incus-openwrt-filogic.rsa.pub</a></li><li><a href="style.css">style.css</a></li>
+</ul>
+</body>
+</html>
