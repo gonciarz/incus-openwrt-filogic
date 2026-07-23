@@ -12,7 +12,7 @@ devices - stays compatible with Filogic 830 (MT7986) devices too.</p>
 <h2>How to add the repository to OpenWrt</h2>
 <pre>wget -O /etc/apk/keys/incus-openwrt-filogic.pem \
     https://gonciarz.github.io/incus-openwrt-filogic/incus-openwrt-filogic.pem
-echo 'https://gonciarz.github.io/incus-openwrt-filogic' \
+echo 'https://gonciarz.github.io/incus-openwrt-filogic/aarch64_cortex-a53/packages.adb' \
     > /etc/apk/repositories.d/incus.list
 
 apk update
