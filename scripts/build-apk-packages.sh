@@ -21,6 +21,7 @@ mkdir -p "$root/usr/bin" "$root/usr/sbin" "$root/etc/init.d"
 cp "$OUT_DIR/incus" "$root/usr/bin/incus"
 cp "$OUT_DIR/incusd" "$root/usr/sbin/incusd"
 cp "$INCUS_INITD" "$root/etc/init.d/incus"
+chmod 755 "$root/usr/bin/incus" "$root/usr/sbin/incusd" "$root/etc/init.d/incus"
 
 root="$PKG_DIR/root-attr-static"
 mkdir -p "$root/usr/bin"
