@@ -17,31 +17,27 @@ XZ_VER="$("$OUT_DIR/stage/xz/usr/bin/xz" --version | head -1 | awk '{print $NF}'
 SQUASHFS_VER="$("$OUT_DIR/stage/squashfs-tools/unsquashfs" -version | head -1 | awk '{print $3}')-r0"
 
 root="$PKG_DIR/root-incus-static"
-mkdir -p "$root/usr/bin" "$root/usr/sbin" "$root/etc/init.d"
-cp "$OUT_DIR/incus" "$root/usr/bin/incus"
-cp "$OUT_DIR/incusd" "$root/usr/sbin/incusd"
-cp "$INCUS_INITD" "$root/etc/init.d/incus"
-chmod 755 "$root/usr/bin/incus" "$root/usr/sbin/incusd" "$root/etc/init.d/incus"
+install -Dm755 "$OUT_DIR/incus" "$root/usr/bin/incus"
+install -Dm755 "$OUT_DIR/incusd" "$root/usr/sbin/incusd"
+install -Dm755 "$INCUS_INITD" "$root/etc/init.d/incus"
 
 root="$PKG_DIR/root-attr-static"
 mkdir -p "$root/usr/bin"
 cp "$OUT_DIR/stage/attr/usr/bin/"* "$root/usr/bin/"
 
 root="$PKG_DIR/root-xz-static"
-mkdir -p "$root/usr/libexec" "$root/usr/bin"
-cp "$OUT_DIR/stage/xz/usr/bin/xz" "$root/usr/libexec/xz-lzmautils"
+install -Dm755 "$OUT_DIR/stage/xz/usr/bin/xz" "$root/usr/libexec/xz-lzmautils"
+mkdir -p "$root/usr/bin"
 for name in xz lzcat lzma unlzma unxz xzcat; do
     ln -s /usr/libexec/xz-lzmautils "$root/usr/bin/$name"
 done
 
 root="$PKG_DIR/root-squashfs-mksquashfs"
-mkdir -p "$root/usr/sbin"
-cp "$OUT_DIR/stage/squashfs-tools/mksquashfs" "$root/usr/sbin/mksquashfs"
+install -Dm755 "$OUT_DIR/stage/squashfs-tools/mksquashfs" "$root/usr/sbin/mksquashfs"
 ln -s mksquashfs "$root/usr/sbin/sqfstar"
 
 root="$PKG_DIR/root-squashfs-unsquashfs"
-mkdir -p "$root/usr/sbin"
-cp "$OUT_DIR/stage/squashfs-tools/unsquashfs" "$root/usr/sbin/unsquashfs"
+install -Dm755 "$OUT_DIR/stage/squashfs-tools/unsquashfs" "$root/usr/sbin/unsquashfs"
 ln -s unsquashfs "$root/usr/sbin/sqfscat"
 
 mkdir -p /root/.keys
